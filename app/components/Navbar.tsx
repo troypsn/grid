@@ -200,7 +200,7 @@ export default function Navbar() {
           }`}
         >
           <nav aria-label="Mobile navigation">
-            <ul className="flex flex-col px-6 divide-y divide-black/[0.04]">
+            <ul className="flex flex-col px-6 divide-y divide-black/[0.03]">
               {activeNavLinks.map((link) => {
                 const isSectionActive = isHome
                   ? activeSection === link.sectionId

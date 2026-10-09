@@ -3,20 +3,21 @@
 import {
   Suspense,
   useCallback,
-  useEffect,
+  useMemo,
   useRef,
   useState,
+  useSyncExternalStore,
 } from "react";
 import * as THREE from "three";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Text } from "@react-three/drei";
+import { Text, useVideoTexture } from "@react-three/drei";
 
 const navItems = [
-  { label: "About Me", image: "/stickman.webm", sectionId: "aboutme" },
-  { label: "Education", image: "/document.webm", sectionId: "education" },
-  { label: "Designs", image: "/pencil.webm", sectionId: "designs" },
-  { label: "Contact", image: "/telephone.webm", sectionId: "contact" },
-  { label: "Projects", image: "/flowers.webm", sectionId: "projects" },
+  { label: "about me", image: "/stickman.webm", sectionId: "aboutme" },
+  { label: "education", image: "/document.webm", sectionId: "education" },
+  { label: "designs", image: "/pencil.webm", sectionId: "designs" },
+  { label: "contact", image: "/telephone.webm", sectionId: "contact" },
+  { label: "projects", image: "/flowers.webm", sectionId: "projects" },
 ];
 
 /* ─────────────────── 3D Orbital Nav (Desktop) ─────────────────── */
@@ -24,7 +25,8 @@ const navItems = [
 function CircularItems() {
   const group = useRef<THREE.Group>(null);
   const hoveredRef = useRef(false);
-  const speedRef = useRef(0.3);
+  const isTabActiveRef = useRef(true);
+  const speedRef = useRef(0.2);
   const angleRef = useRef(0);
 
   // Wide ellipse to orbit around center text
@@ -40,17 +42,20 @@ function CircularItems() {
   }, []);
 
   useFrame((_, delta) => {
-    if (!group.current) return;
+    if (!group.current || !isTabActiveRef.current) return;
+
+    // Clamp delta to prevent frame jumps when waking/returning from another tab
+    const safeDelta = Math.min(delta, 0.05);
 
     // Smoothly decelerate / accelerate
-    const targetSpeed = hoveredRef.current ? 0 : 0.3;
+    const targetSpeed = hoveredRef.current ? 0 : 0.05;
     speedRef.current = THREE.MathUtils.lerp(
       speedRef.current,
       targetSpeed,
-      delta * 2
+      safeDelta * 3
     );
 
-    angleRef.current += delta * speedRef.current;
+    angleRef.current += safeDelta * speedRef.current;
 
     const count = navItems.length;
     for (let i = 0; i < count; i++) {
@@ -97,60 +102,42 @@ function NavObject({
   onHoverStart: () => void;
   onHoverEnd: () => void;
 }) {
-  const [texture, setTexture] =
-    useState<THREE.VideoTexture | null>(null);
-  const [planeSize, setPlaneSize] =
-    useState<[number, number] | null>(null);
+  const texture = useVideoTexture(image, {
+    muted: true,
+    loop: true,
+    start: true,
+    playsInline: true,
+    crossOrigin: "anonymous",
+  });
+
   const [hovered, setHovered] = useState(false);
   const groupRef = useRef<THREE.Group>(null);
   const scaleRef = useRef(1);
 
-  useEffect(() => {
-    const video = document.createElement("video");
-    video.src = image;
-    video.muted = true;
-    video.loop = true;
-    video.autoplay = true;
-    video.playsInline = true;
+  const planeSize: [number, number] = useMemo(() => {
+    const video = texture.image as HTMLVideoElement;
+    const vw = video?.videoWidth || 1;
+    const vh = video?.videoHeight || 1;
+    const aspect = vw / vh;
 
-    video.addEventListener("loadedmetadata", () => {
-      const vw = video.videoWidth;
-      const vh = video.videoHeight;
-      const aspect = vw / vh;
-
-      let w = MAX_W;
-      let h = w / aspect;
-      if (h > MAX_H) {
-        h = MAX_H;
-        w = h * aspect;
-      }
-      setPlaneSize([w, h]);
-    });
-
-    const videoTexture = new THREE.VideoTexture(video);
-    videoTexture.colorSpace = THREE.SRGBColorSpace;
-    setTexture(videoTexture);
-
-    video.play().catch((error) => {
-      console.error(`Failed to play ${image}:`, error);
-    });
-
-    return () => {
-      video.pause();
-      video.removeAttribute("src");
-      video.load();
-      videoTexture.dispose();
-    };
-  }, [image]);
+    let w = MAX_W;
+    let h = w / aspect;
+    if (h > MAX_H) {
+      h = MAX_H;
+      w = h * aspect;
+    }
+    return [w, h];
+  }, [texture]);
 
   // Smooth scale animation on hover
   useFrame((_, delta) => {
     if (!groupRef.current) return;
+    const safeDelta = Math.min(delta, 0.05);
     const target = hovered ? 1.15 : 1;
     scaleRef.current = THREE.MathUtils.lerp(
       scaleRef.current,
       target,
-      delta * 8
+      safeDelta * 8
     );
     groupRef.current.scale.setScalar(scaleRef.current);
   });
@@ -168,13 +155,10 @@ function NavObject({
   }, [onHoverEnd]);
 
   const handleClick = useCallback(() => {
-    const el = document.getElementById(sectionId);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth" });
-    }
+    window.location.href = `/${sectionId}`;
   }, [sectionId]);
 
-  const halfH = planeSize ? planeSize[1] / 2 : 0.75;
+  const halfH = planeSize[1] / 2;
 
   return (
     <group
@@ -183,16 +167,14 @@ function NavObject({
       onPointerOut={handlePointerOut}
       onClick={handleClick}
     >
-      {texture && planeSize && (
-        <mesh>
-          <planeGeometry args={planeSize} />
-          <meshBasicMaterial
-            map={texture}
-            transparent
-            toneMapped={false}
-          />
-        </mesh>
-      )}
+      <mesh>
+        <planeGeometry args={planeSize} />
+        <meshBasicMaterial
+          map={texture}
+          transparent
+          toneMapped={false}
+        />
+      </mesh>
 
       <Text
         position={[0, -(halfH + 0.2), 0]}
@@ -219,24 +201,14 @@ function DockItem({
   image: string;
   sectionId: string;
 }) {
-  const videoRef = useRef<HTMLVideoElement>(null);
   const [tapped, setTapped] = useState(false);
-
-  useEffect(() => {
-    const v = videoRef.current;
-    if (v) {
-      v.play().catch(() => {});
-    }
-  }, []);
 
   const handleClick = useCallback(() => {
     setTapped(true);
-    setTimeout(() => setTapped(false), 300);
-
-    const el = document.getElementById(sectionId);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth" });
-    }
+    setTimeout(() => {
+      setTapped(false);
+      window.location.href = `/${sectionId}`;
+    }, 150);
   }, [sectionId]);
 
   return (
@@ -247,7 +219,6 @@ function DockItem({
     >
       <div className="dock-icon-wrapper">
         <video
-          ref={videoRef}
           src={image}
           muted
           loop
@@ -266,7 +237,7 @@ function DockNav() {
   return (
     <nav className="dock-container" aria-label="Main navigation">
       <div className="dock-bar">
-        {navItems.map((item, i) => (
+        {navItems.map((item) => (
           <DockItem
             key={item.label}
             label={item.label}
@@ -281,22 +252,34 @@ function DockNav() {
 
 /* ─────────────────── Main Export ─────────────────── */
 
+const subscribeMediaQuery = (callback: () => void) => {
+  const mq = window.matchMedia("(max-width: 1024px)");
+  mq.addEventListener("change", callback);
+  return () => mq.removeEventListener("change", callback);
+};
+
+const getMediaQuerySnapshot = () => window.matchMedia("(max-width: 1024px)").matches;
+const getMediaQueryServerSnapshot = () => false;
+
+const emptySubscribe = () => () => { };
+const getIsMountedSnapshot = () => true;
+const getIsMountedServerSnapshot = () => false;
+
 export default function CircularNav() {
-  const [isMobile, setIsMobile] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const isMounted = useSyncExternalStore(
+    emptySubscribe,
+    getIsMountedSnapshot,
+    getIsMountedServerSnapshot
+  );
 
-  useEffect(() => {
-    setMounted(true);
-    const mq = window.matchMedia("(max-width: 1024px)");
-    setIsMobile(mq.matches);
-
-    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
-    mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
-  }, []);
+  const isMobile = useSyncExternalStore(
+    subscribeMediaQuery,
+    getMediaQuerySnapshot,
+    getMediaQueryServerSnapshot
+  );
 
   // Prevent SSR mismatch — render nothing on the server
-  if (!mounted) return null;
+  if (!isMounted) return null;
 
   if (isMobile) {
     return <DockNav />;

@@ -31,12 +31,37 @@ const kulimPark = Kulim_Park({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL || "https://troypineda.vercel.app/"
+  ),
   title: "Grid By Troy Pineda",
   description: "A personal portfolio and web space by Troy Pineda.",
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",
     apple: "/favicon.svg",
+  },
+  openGraph: {
+    title: "Grid By Troy Pineda",
+    description: "A personal portfolio and web space by Troy Pineda.",
+    url: "/",
+    siteName: "Grid By Troy Pineda",
+    images: [
+      {
+        url: "/grid-preview.png",
+        width: 1200,
+        height: 630,
+        alt: "Grid By Troy Pineda - Portfolio Preview",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Grid By Troy Pineda",
+    description: "A personal portfolio and web space by Troy Pineda.",
+    images: ["/grid-preview.png"],
   },
 };
 

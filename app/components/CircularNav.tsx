@@ -8,6 +8,7 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
+import { useTransitionRouter } from "./PageTransition";
 import * as THREE from "three";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Text, useVideoTexture } from "@react-three/drei";
@@ -28,10 +29,11 @@ function CircularItems() {
   const isTabActiveRef = useRef(true);
   const speedRef = useRef(0.2);
   const angleRef = useRef(0);
+  const bloomProgressRef = useRef(0.05);
 
-  // Wide ellipse to orbit around center text
-  const radiusX = 7;
-  const radiusY = 4.5;
+  // Target elliptical radii
+  const targetRadiusX = 7;
+  const targetRadiusY = 4.5;
 
   const handleHoverStart = useCallback(() => {
     hoveredRef.current = true;
@@ -47,12 +49,22 @@ function CircularItems() {
     // Clamp delta to prevent frame jumps when waking/returning from another tab
     const safeDelta = Math.min(delta, 0.05);
 
+    // Smooth blooming expansion from center outwards
+    bloomProgressRef.current = THREE.MathUtils.lerp(
+      bloomProgressRef.current,
+      1,
+      safeDelta * 3.2
+    );
+
+    const currentRadiusX = targetRadiusX * bloomProgressRef.current;
+    const currentRadiusY = targetRadiusY * bloomProgressRef.current;
+
     // Smoothly decelerate / accelerate
     const targetSpeed = hoveredRef.current ? 0 : 0.05;
     speedRef.current = THREE.MathUtils.lerp(
       speedRef.current,
       targetSpeed,
-      safeDelta * 3
+      safeDelta * 3.5
     );
 
     angleRef.current += safeDelta * speedRef.current;
@@ -65,19 +77,20 @@ function CircularItems() {
       const itemAngle =
         angleRef.current + (i / count) * Math.PI * 2;
 
-      child.position.x = Math.cos(itemAngle) * radiusX;
-      child.position.y = Math.sin(itemAngle) * radiusY;
+      child.position.x = Math.cos(itemAngle) * currentRadiusX;
+      child.position.y = Math.sin(itemAngle) * currentRadiusY;
     }
   });
 
   return (
     <group ref={group}>
-      {navItems.map((item) => (
+      {navItems.map((item, idx) => (
         <NavObject
           key={item.label}
           label={item.label}
           image={item.image}
           sectionId={item.sectionId}
+          index={idx}
           onHoverStart={handleHoverStart}
           onHoverEnd={handleHoverEnd}
         />
@@ -93,12 +106,14 @@ function NavObject({
   label,
   image,
   sectionId,
+  index,
   onHoverStart,
   onHoverEnd,
 }: {
   label: string;
   image: string;
   sectionId: string;
+  index: number;
   onHoverStart: () => void;
   onHoverEnd: () => void;
 }) {
@@ -113,6 +128,7 @@ function NavObject({
   const [hovered, setHovered] = useState(false);
   const groupRef = useRef<THREE.Group>(null);
   const scaleRef = useRef(1);
+  const entranceScaleRef = useRef(0.1);
 
   const planeSize: [number, number] = useMemo(() => {
     const video = texture.image as HTMLVideoElement;
@@ -129,17 +145,25 @@ function NavObject({
     return [w, h];
   }, [texture]);
 
-  // Smooth scale animation on hover
+  // Smooth entrance bloom + hover scale animation
   useFrame((_, delta) => {
     if (!groupRef.current) return;
     const safeDelta = Math.min(delta, 0.05);
+
+    // Staggered entrance scale
+    entranceScaleRef.current = THREE.MathUtils.lerp(
+      entranceScaleRef.current,
+      1,
+      safeDelta * (3.0 + index * 0.2)
+    );
+
     const target = hovered ? 1.15 : 1;
     scaleRef.current = THREE.MathUtils.lerp(
       scaleRef.current,
       target,
       safeDelta * 8
     );
-    groupRef.current.scale.setScalar(scaleRef.current);
+    groupRef.current.scale.setScalar(scaleRef.current * entranceScaleRef.current);
   });
 
   const handlePointerOver = useCallback(() => {
@@ -154,9 +178,11 @@ function NavObject({
     document.body.style.cursor = "auto";
   }, [onHoverEnd]);
 
+  const { navigateTo } = useTransitionRouter();
+
   const handleClick = useCallback(() => {
-    window.location.href = `/${sectionId}`;
-  }, [sectionId]);
+    navigateTo(`/${sectionId}`);
+  }, [navigateTo, sectionId]);
 
   const halfH = planeSize[1] / 2;
 
@@ -196,25 +222,29 @@ function DockItem({
   label,
   image,
   sectionId,
+  index,
 }: {
   label: string;
   image: string;
   sectionId: string;
+  index: number;
 }) {
+  const { navigateTo } = useTransitionRouter();
   const [tapped, setTapped] = useState(false);
 
   const handleClick = useCallback(() => {
     setTapped(true);
     setTimeout(() => {
       setTapped(false);
-      window.location.href = `/${sectionId}`;
+      navigateTo(`/${sectionId}`);
     }, 150);
-  }, [sectionId]);
+  }, [navigateTo, sectionId]);
 
   return (
     <button
       onClick={handleClick}
-      className={`dock-item ${tapped ? "dock-item-tapped" : ""}`}
+      className={`dock-item dock-item-entrance ${tapped ? "dock-item-tapped" : ""}`}
+      style={{ animationDelay: `${index * 80 + 250}ms` }}
       aria-label={`Navigate to ${label}`}
     >
       <div className="dock-icon-wrapper">
@@ -237,12 +267,13 @@ function DockNav() {
   return (
     <nav className="dock-container" aria-label="Main navigation">
       <div className="dock-bar">
-        {navItems.map((item) => (
+        {navItems.map((item, idx) => (
           <DockItem
             key={item.label}
             label={item.label}
             image={item.image}
             sectionId={item.sectionId}
+            index={idx}
           />
         ))}
       </div>

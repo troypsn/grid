@@ -5,7 +5,7 @@ export default function ContactSection() {
     { label: "github", handle: "@troypsn", href: "https://github.com/troypsn" },
     { label: "linkedin", handle: "@Troy Pineda", href: "https://www.linkedin.com/in/troy-pineda-2a0a61441/" },
     { label: "instagram", handle: "@taskykopi", href: "https://www.instagram.com/tastykopi/" },
-    { label: "email", handle: "troypineda.dev@gmail.com", href: "mailto:troypineda.dev@gmail.com" },
+    { label: "email", handle: "troy.arcilla.pineda@gmail.com", href: "mailto:troy.arcilla.pineda@gmail.com" },
   ];
 
   return (
@@ -13,7 +13,7 @@ export default function ContactSection() {
       id="contact"
       className="relative z-10 py-20 sm:py-28 px-6 sm:px-10 lg:px-16 max-w-4xl mx-auto text-black"
     >
-      {/* Call to Action Container matching wireframe */}
+
       <div className="text-center space-y-5 mb-14 sm:mb-16">
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-kulim font-light text-black tracking-tight">
           lets connect &amp; collaborate.
@@ -29,7 +29,7 @@ export default function ContactSection() {
         </div>
       </div>
 
-      {/* Contacts List matching wireframe */}
+
       <div className="max-w-md mx-auto pt-8 border-t border-black/15">
         <h3 className="font-kulim text-base font-semibold text-black mb-6">
           contact

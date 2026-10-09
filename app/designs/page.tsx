@@ -1,11 +1,14 @@
-import Link from "next/link";
+import Navbar from "../components/Navbar";
 import ContactSection from "../components/ContactSection";
 import Footer from "../components/Footer";
 
 export default function DesignsPage() {
   return (
-    <main className="relative min-h-screen overflow-x-hidden text-black selection:bg-black selection:text-[#FCFDEC] flex flex-col justify-between">
-      {/* Subtle Yellow Grid Paper Background Texture */}
+    <main className="relative min-h-screen pt-16 sm:pt-20 overflow-x-hidden text-black selection:bg-black selection:text-[#FCFDEC] flex flex-col justify-between">
+      {/* Top Main Navigation */}
+      <Navbar />
+
+
       <div
         aria-hidden="true"
         className="
@@ -18,23 +21,10 @@ export default function DesignsPage() {
         "
       />
 
-      {/* Top Simple Sub-Navigation */}
-      <header className="relative z-10 w-full border-b border-black/10 bg-[#FCFDEC]/80 backdrop-blur-xs">
-        <div className="max-w-6xl mx-auto px-6 sm:px-10 py-4 flex items-center justify-between">
-          <Link
-            href="/"
-            className="font-kode text-xs sm:text-sm font-medium tracking-tight text-black/75 hover:text-black transition-colors flex items-center gap-1.5"
-          >
-            <span>←</span>
-            <span>back to home</span>
-          </Link>
-        </div>
-      </header>
-
       {/* Designs Content Container */}
-      <div className="relative z-10 max-w-6xl mx-auto px-6 sm:px-10 py-20 w-full flex-1 flex flex-col justify-center items-center text-center">
-        <h1 className="text-4xl sm:text-5xl md:text-6xl font-kulim font-light tracking-tight text-black mb-6">
-          Designs
+      <div className="relative z-10 max-w-6xl mx-auto px-5 sm:px-8 md:px-10 lg:px-16 py-10 sm:py-16 md:py-20 w-full flex-1 flex flex-col justify-center items-center text-center">
+        <h1 className="text-3xl sm:text-5xl md:text-6xl font-kulim font-light tracking-tight text-black mb-6">
+          Designs - Coming Soon
         </h1>
       </div>
 

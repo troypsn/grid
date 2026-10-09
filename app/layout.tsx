@@ -6,6 +6,8 @@ import {
   Kulim_Park,
 } from "next/font/google";
 import "./globals.css";
+import SmoothScroll from "./components/SmoothScroll";
+import PageTransition from "./components/PageTransition";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,8 +31,13 @@ const kulimPark = Kulim_Park({
 });
 
 export const metadata: Metadata = {
-  title: "Your Portfolio",
-  description: "Your portfolio website",
+  title: "Grid By Troy Pineda",
+  description: "A personal portfolio and web space by Troy Pineda.",
+  icons: {
+    icon: "/favicon.svg",
+    shortcut: "/favicon.svg",
+    apple: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({
@@ -44,12 +51,12 @@ export default function RootLayout({
         ${geistMono.variable}
         ${kodeMono.variable}
         ${kulimPark.variable}
-        h-full
         antialiased
       `}
     >
-      <body className="min-h-full flex flex-col">
-        {children}
+      <body className="flex flex-col min-h-screen">
+        <SmoothScroll />
+        <PageTransition>{children}</PageTransition>
       </body>
     </html>
   );

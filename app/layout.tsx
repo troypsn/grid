@@ -80,6 +80,18 @@ export default function RootLayout({
       `}
     >
       <body className="flex flex-col min-h-screen">
+        {/* Persistent fixed grid background texture (viewport-locked, does not move on scroll) */}
+        <div
+          aria-hidden="true"
+          className="
+            pointer-events-none
+            fixed inset-0
+            opacity-[0.06]
+            [background-image:linear-gradient(to_right,#000000_1px,transparent_1px),linear-gradient(to_bottom,#000000_1px,transparent_1px)]
+            [background-size:50px_50px]
+            z-0
+          "
+        />
         <SmoothScroll />
         <PageTransition>{children}</PageTransition>
       </body>

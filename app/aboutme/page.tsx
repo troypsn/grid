@@ -24,19 +24,6 @@ export default function AboutMePage() {
       {/* Top Main Navigation */}
       <Navbar />
 
-      {/* Background grid */}
-      <div
-        aria-hidden="true"
-        className="
-          pointer-events-none
-          fixed inset-0
-          opacity-[0.06]
-          [background-image:linear-gradient(to_right,#000000_1px,transparent_1px),linear-gradient(to_bottom,#000000_1px,transparent_1px)]
-          [background-size:50px_50px]
-          z-0
-        "
-      />
-
       <div className="relative z-10 max-w-6xl mx-auto px-5 sm:px-8 md:px-10 lg:px-16 py-10 sm:py-16 md:py-20 w-full flex-1 flex flex-col justify-center">
         <h1 className="text-3xl sm:text-5xl md:text-6xl font-kulim font-light tracking-tight text-black mb-8 sm:mb-12 md:mb-16 text-center">
           About Me

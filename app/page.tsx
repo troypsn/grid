@@ -17,18 +17,6 @@ export default function Home() {
     <main className="relative overflow-x-hidden text-black selection:bg-black selection:text-[#FCFDEC]">
       <Navbar />
 
-      <div
-        aria-hidden="true"
-        className="
-          pointer-events-none
-          fixed inset-0
-          opacity-[0.06]
-          [background-image:linear-gradient(to_right,#000000_1px,transparent_1px),linear-gradient(to_bottom,#000000_1px,transparent_1px)]
-          [background-size:50px_50px]
-          z-0
-        "
-      />
-
       <section className="relative min-h-screen flex flex-col items-center justify-center p-5 sm:p-8 md:p-10 z-10">
         <HeroText />
         <CircularNav />

@@ -8,19 +8,6 @@ export default function ContactPage() {
       {/* Top Main Navigation */}
       <Navbar />
 
-      {/* Subtle Yellow Grid Paper Background Texture */}
-      <div
-        aria-hidden="true"
-        className="
-          pointer-events-none
-          fixed inset-0
-          opacity-[0.06]
-          [background-image:linear-gradient(to_right,#000000_1px,transparent_1px),linear-gradient(to_bottom,#000000_1px,transparent_1px)]
-          [background-size:50px_50px]
-          z-0
-        "
-      />
-
       <div className="flex-1 flex flex-col justify-center">
         <ContactSection />
       </div>

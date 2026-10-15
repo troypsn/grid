@@ -47,7 +47,7 @@ export const projects: ProjectItem[] = [
   },
   {
     title: "GeloPOS",
-    subtitle: "AI Helper for legal summaries and questions",
+    subtitle: "A Point of sale system made for a food canteen",
     stack: "ReactNative, Supabase",
     image: "/gelopos.png",
     roles: "UI/UX Designer, Front-End Developer, Backend Developer, Database Management",

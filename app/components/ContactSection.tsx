@@ -30,7 +30,7 @@ export default function ContactSection() {
       </div>
 
 
-      <div className="max-w-md mx-auto pt-8 border-t border-black/15">
+      <div className="max-w-md mx-auto pt-8 ">
         <h3 className="font-kulim text-base font-semibold text-black mb-6">
           contact
         </h3>

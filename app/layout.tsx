@@ -80,7 +80,7 @@ export default function RootLayout({
       `}
     >
       <body className="flex flex-col min-h-screen">
-        {/* Persistent fixed grid background texture (viewport-locked, does not move on scroll) */}
+
         <div
           aria-hidden="true"
           className="

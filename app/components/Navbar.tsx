@@ -127,7 +127,7 @@ export default function Navbar() {
           : "-translate-y-full opacity-0 pointer-events-none"
       }`}
     >
-      <div className="w-full bg-[#FCFDEC]/60 backdrop-blur-md border-b border-black/[0.08] shadow-[0_2px_12px_rgba(0,0,0,0.03)]">
+      <div className="w-full bg-[#FCFDEC]/10 backdrop-blur-md border-b border-black/[0.08] shadow-[0_2px_12px_rgba(0,0,0,0.03)]">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 py-4 flex items-center justify-between">
           {/* "grid" button on the left -> returns to landing / scrolls to top */}
           <button

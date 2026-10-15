@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import Image from "next/image";
 import Link from "next/link";
 import { ProjectItem } from "./ProjectCard";
+import { div } from "three/tsl";
 
 interface ProjectModalProps {
   project: ProjectItem | null;
@@ -131,10 +132,27 @@ export default function ProjectModal({
             <span className="font-kode text-xs sm:text-sm text-black/75 block">
               <span className="font-medium text-black">Stack:</span> {project.stack}
             </span>
+            <span className="font-kode text-xs sm:text-sm text-black/75 block">
+              <span className="font-medium text-black">Project Role:</span> {project.roles}
+            </span>
           </div>
 
-          {/* Actions: GitHub link & View Other Projects */}
-          <div className="pt-4 sm:pt-5 border-t border-black/10 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
+          {project.design ? (<div className="pt-4 sm:pt-5 border-t border-black/10 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
+            <a
+              href={project.design || "https://github.com/troypsn"}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 border border-black bg-transparent text-black hover:bg-black hover:text-white px-5 py-2.5 font-kode text-xs sm:text-sm tracking-wide hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all duration-300 ease-in-out cursor-pointer"
+            >
+              <span>View Design</span>
+              <span></span>
+            </a>
+
+            
+          </div>) : (<></>) 
+          }
+
+          {project.link ? (<div className="  flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
             <a
               href={project.link || "https://github.com/troypsn"}
               target="_blank"
@@ -153,7 +171,11 @@ export default function ProjectModal({
               <span>view other projects</span>
               <span>→</span>
             </Link>
-          </div>
+          </div>) : (<></>) 
+          }
+
+          
+          
         </div>
       </div>
     </div>,

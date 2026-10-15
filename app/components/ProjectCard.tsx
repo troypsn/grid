@@ -10,6 +10,8 @@ export interface ProjectItem {
   stack: string;
   image?: string;
   link?: string;
+  design?: string;
+  roles? : string;
 }
 
 interface ProjectCardProps {
@@ -60,6 +62,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
             <span className="font-kode text-[10px] sm:text-[11px] text-black/70 block truncate">
               Stack: {project.stack}
             </span>
+            
           </div>
         </div>
       </div>
